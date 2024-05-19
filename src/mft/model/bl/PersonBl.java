@@ -5,16 +5,18 @@ import mft.controller.exceptions.FailedRequiermentException;
 import mft.controller.exceptions.NoPersonFoundException;
 import mft.model.da.PersonDa;
 import mft.model.entity.Person;
+import mft.model.tools.CRUD;
 
 import java.util.List;
 
-public class PersonBl {
+public class PersonBl implements CRUD<Person> {
     @Getter
     private static PersonBl personBl = new PersonBl();
 
     private PersonBl() {
     }
 
+    @Override
     public Person save(Person person) throws Exception {
         try (PersonDa personDa = new PersonDa()) {
             personDa.save(person);
@@ -22,6 +24,7 @@ public class PersonBl {
         }
     }
 
+    @Override
     public Person edit(Person person) throws Exception {
         try (PersonDa personDa = new PersonDa()) {
             if (personDa.findById(person.getId()) != null) {
@@ -33,6 +36,7 @@ public class PersonBl {
         }
     }
 
+    @Override
     public Person remove(int id) throws Exception {
         try (PersonDa personDa = new PersonDa()) {
             Person person = personDa.findById(id);
@@ -45,6 +49,7 @@ public class PersonBl {
         }
     }
 
+    @Override
     public List<Person> findAll() throws Exception {
         try (PersonDa personDa = new PersonDa()) {
             List<Person> perosnList = personDa.findAll();
@@ -56,6 +61,7 @@ public class PersonBl {
         }
     }
 
+    @Override
     public Person findById(int id) throws Exception {
         try (PersonDa personDa = new PersonDa()) {
             Person person = personDa.findById(id);

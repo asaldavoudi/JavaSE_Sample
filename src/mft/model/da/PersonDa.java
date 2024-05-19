@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j;
 import mft.model.entity.Person;
 import mft.model.entity.enums.City;
 import mft.model.entity.enums.Gender;
+import mft.model.tools.CRUD;
 import mft.model.tools.ConnectionProvider;
 
 import java.sql.*;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Log4j
-public class PersonDa implements AutoCloseable {
+public class PersonDa implements AutoCloseable, CRUD {
     private final Connection connection;
     private PreparedStatement preparedStatement;
 
@@ -19,7 +20,8 @@ public class PersonDa implements AutoCloseable {
         connection = ConnectionProvider.getConnectionProvider().getConnection();
     }
 
-    public void save(Person person) throws SQLException {
+    @Override
+    public Person save(Person person) throws Exception {
         person.setId(ConnectionProvider.getConnectionProvider().getNextId("PERSON_SEQ"));
 
         preparedStatement = connection.prepareStatement(
@@ -35,9 +37,11 @@ public class PersonDa implements AutoCloseable {
         preparedStatement.setBoolean(8, person.isJavaSESkill());
         preparedStatement.setBoolean(9, person.isJavaEESkill());
         preparedStatement.execute();
+        return person;
     }
 
-    public void edit(Person person) throws SQLException {
+    @Override
+    public Person edit(Person person) throws Exception {
         preparedStatement = connection.prepareStatement(
                 "UPDATE PERSON SET NAME=?, FAMILY=?, GENDER=?, BIRTH_DATE=?, CITY=?, ALGO=?, SE=?, EE=? WHERE ID=?"
         );
@@ -51,17 +55,21 @@ public class PersonDa implements AutoCloseable {
         preparedStatement.setBoolean(8, person.isJavaEESkill());
         preparedStatement.setInt(9, person.getId());
         preparedStatement.execute();
+        return person;
     }
 
-    public void remove(int id) throws SQLException {
+    @Override
+    public Person remove(int id) throws Exception {
         preparedStatement = connection.prepareStatement(
                 "DELETE FROM PERSON WHERE ID=?"
         );
         preparedStatement.setInt(1, id);
         preparedStatement.execute();
+        return null;
     }
 
-    public List<Person> findAll() throws SQLException {
+    @Override
+    public List<Person> findAll() throws Exception {
         List<Person> personList = new ArrayList<>();
 
         preparedStatement = connection.prepareStatement("SELECT * FROM PERSON ORDER BY ID");
@@ -87,7 +95,8 @@ public class PersonDa implements AutoCloseable {
         return personList;
     }
 
-    public Person findById(int id) throws SQLException {
+    @Override
+    public Person findById(int id) throws Exception {
         preparedStatement = connection.prepareStatement("SELECT * FROM PERSON WHERE ID=?");
         preparedStatement.setInt(1, id);
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -109,7 +118,7 @@ public class PersonDa implements AutoCloseable {
         return person;
     }
 
-    public List<Person> findByFamily(String family) throws SQLException {
+    public List<Person> findByFamily(String family) throws Exception {
         List<Person> personList = new ArrayList<>();
 
         preparedStatement = connection.prepareStatement("SELECT * FROM PERSON WHERE FAMILY LIKE? ORDER BY ID");
